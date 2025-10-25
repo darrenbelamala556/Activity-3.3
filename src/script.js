@@ -134,12 +134,17 @@ window.addEventListener('scroll', () =>{
                 z: '+=1.5'
             }
         )
-        gsap.to(material.color, {
+
+        const bgColor = new THREE.Color(parameters.sectionColors[currentSection]).lerp(
+            new THREE.Color("#1e1a20"), 
+            0.5 // 0 = full section color, 1 = black — adjust for brightness
+        );
+
+        gsap.to(document.body, {
+            backgroundColor: `#${bgColor.getHexString()}`,
             duration: 1.5,
-            r: new THREE.Color(parameters.sectionColors[currentSection]).r,
-            g: new THREE.Color(parameters.sectionColors[currentSection]).g,
-            b: new THREE.Color(parameters.sectionColors[currentSection]).b
-        })
+            ease: "power2.inOut"
+        });
 
         gsap.to(particlesMaterial.color, {
             duration: 1.5,
@@ -251,6 +256,14 @@ const tick = () =>
     particlesMaterial.color.lerpColors(baseColor, white, pulse * 0.4);
     particles.position.y = Math.sin(elapsedTime * 0.5) * 0.2;
 
+    //Animate titles
+    document.querySelectorAll('.title').forEach(title => {
+        const pulseIntensity = pulse * 0.3; // adjust 0.3–0.6 for stronger glow
+        const currentColor = new THREE.Color(parameters.sectionColors[currentSection]);
+        const pulseColor = currentColor.clone().lerp(new THREE.Color('#ffffff'), pulseIntensity);
+        title.style.color = `#${pulseColor.getHexString()}`;
+        title.style.textShadow = `0 0 ${5 + pulseIntensity * 15}px ${title.style.color}`;
+    });
     // Animate camera
     camera.position.y = - scrollY / sizes.height * objectsDistance
 
